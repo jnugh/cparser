@@ -558,6 +558,7 @@ static void do_firm_optimizations(void)
 	for (size_t i = 0; i < get_irp_n_irgs(); i++) {
 		ir_graph *irg = get_irp_irg(i);
 
+		do_irg_opt(irg, "parallelize-mem");
 
 		do_irg_opt(irg, "scalar-replace");
 		do_irg_opt(irg, "invert-loops");
