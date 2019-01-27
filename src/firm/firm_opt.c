@@ -568,7 +568,6 @@ static void do_firm_optimizations(void)
 		do_irg_opt(irg, "local");
 		do_irg_opt(irg, "gcse");
 		do_irg_opt(irg, "place");
-		do_irg_opt(irg, "parallelize-mem");
 
 		if (firm_opt.confirm) {
 			/* Confirm construction currently can only handle blocks with only
@@ -579,6 +578,7 @@ static void do_firm_optimizations(void)
 			do_irg_opt(irg, "confirm");
 			do_irg_opt(irg, "vrp");
 			do_irg_opt(irg, "local");
+			do_irg_opt(irg, "parallelize-mem");
 		}
 
 		do_irg_opt(irg, "control-flow");
@@ -652,6 +652,7 @@ static void do_firm_lowering(void)
 		do_irg_opt(irg, "deconv");
 		do_irg_opt(irg, "occults");
 		do_irg_opt(irg, "control-flow");
+		do_irg_opt(irg, "parallelize-mem");
 		do_irg_opt(irg, "opt-load-store");
 		do_irg_opt(irg, "gcse");
 		do_irg_opt(irg, "place");
@@ -673,6 +674,7 @@ static void do_firm_lowering(void)
 		add_irg_constraints(irg, IR_GRAPH_CONSTRAINT_NORMALISATION2);
 		do_irg_opt(irg, "local");
 
+		do_irg_opt(irg, "parallelize-mem");
 		do_irg_opt(irg, "parallelize-mem");
 		do_irg_opt(irg, "memcombine");
 		do_irg_opt(irg, "local");
