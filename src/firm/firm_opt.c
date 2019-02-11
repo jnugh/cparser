@@ -675,7 +675,6 @@ static void do_firm_lowering(void)
 		do_irg_opt(irg, "local");
 
 		do_irg_opt(irg, "parallelize-mem");
-		do_irg_opt(irg, "parallelize-mem");
 		do_irg_opt(irg, "memcombine");
 		do_irg_opt(irg, "local");
 		do_irg_opt(irg, "frame");
