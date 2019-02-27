@@ -38,6 +38,8 @@ struct a_firm_opt {
 	int      clone_threshold; /**< The threshold value for procedure cloning. */
 	unsigned inline_maxsize;  /**< Maximum function size for inlining. */
 	unsigned inline_threshold;/**< Inlining benefice threshold. */
+	unsigned unroll_factor;   /**< unroll factor for loop unrolling */
+	unsigned unroll_maxsize;  /**< maximum number of nodes in loop */
 };
 
 /* dumping options */
@@ -73,6 +75,8 @@ static struct a_firm_opt firm_opt = {
 	.clone_threshold  =  DEFAULT_CLONE_THRESHOLD,
 	.inline_maxsize   =  750,
 	.inline_threshold =  0,
+	.unroll_factor    =  4,
+	.unroll_maxsize   =  64,
 };
 
 /* dumping options */
@@ -114,6 +118,8 @@ static const struct params {
   { X("strict-aliasing"),        &firm_opt.strict_alias,     1, "strict alias rules" },
   { X("no-strict-aliasing"),     &firm_opt.strict_alias,     0, "strict alias rules" },
   { X("clone-threshold=<value>"),NULL,                       0, "set clone threshold to <value>" },
+  { X("unroll-max-size=<size>"), NULL,                       0, "set maximum size of loops for loop unrolling" },
+  { X("unroll-factor=<size>"),   NULL,                       0, "set unroll factor for loop unrolling" },
 
   /* other firm regarding options */
   { X("verify-off"),             &firm_opt.verify,           0, "disable node verification" },
@@ -343,6 +349,11 @@ static void do_gcse(ir_graph *irg)
 	set_opt_global_cse(0);
 }
 
+static void do_loop_unrolling2(ir_graph *irg)
+{
+	unroll_loops(irg, firm_opt.unroll_factor, firm_opt.unroll_maxsize);
+}
+
 static opt_config_t opts[] = {
 #define IRG(a, b, c, d) { OPT_TARGET_IRG, a, .u.transform_irg = b, c, d }
 #define IRP(a, b, c, d) { OPT_TARGET_IRP, a, .u.transform_irp = b, c, d }
@@ -373,7 +384,7 @@ static opt_config_t opts[] = {
 	IRG("scalar-replace",    scalar_replacement_opt,   "scalar replacement",                                    OPT_FLAG_NONE),
 	IRG("shape-blocks",      shape_blocks,             "block shaping",                                         OPT_FLAG_NONE),
 	IRG("thread-jumps",      opt_jumpthreading,        "path-sensitive jumpthreading",                          OPT_FLAG_NONE),
-	IRG("unroll-loops",      do_loop_unrolling,        "loop unrolling",                                        OPT_FLAG_NONE),
+	IRG("unroll-loops",      do_loop_unrolling2,       "loop unrolling",                                        OPT_FLAG_NONE),
 	IRG("vrp",               set_vrp_data,             "value range propagation",                               OPT_FLAG_NONE),
 	IRG("rts",               rts_map,                  "optimization of known library functions",               OPT_FLAG_NONE),
 	IRP("inline",            do_inline,                "inlining",                                              OPT_FLAG_NONE),
@@ -850,6 +861,12 @@ int firm_option(const char *const opt)
 		return 1;
 	} else if ((val = strstart(opt, "inline-threshold="))) {
 		sscanf(val, "%u", &firm_opt.inline_threshold);
+		return 1;
+	} else if ((val = strstart(opt, "unroll-factor="))) {
+		sscanf(val, "%u", &firm_opt.unroll_factor);
+		return 1;
+	} else if ((val = strstart(opt, "unroll-max-size="))) {
+		sscanf(val, "%u", &firm_opt.unroll_maxsize);
 		return 1;
 	} else if (streq(opt, "no-opt")) {
 		disable_all_opts();
